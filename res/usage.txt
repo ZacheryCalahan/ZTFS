@@ -1,0 +1,19 @@
+Usage:
+    ./ztfs_util {command} [arguments...]
+
+    commands:
+        -c  Create ztfs image file
+            arguments:
+                <disk image> Name of the image to create
+                <block size> Block size in bytes
+                <file system size> Size of the file system in bytes
+        
+        -p  Display current info about an image file
+            arguments:
+                <disk image> Path to the image
+
+        (Not yet implemented)
+        -t Display the current directory layout in tree format
+            arguments:
+                <disk image> Path to the image
+
