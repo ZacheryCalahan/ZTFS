@@ -25,7 +25,7 @@ Almost all values are constants, and only a few are strictly required to interfa
 - The block size MUST be a multiple of 1024, and not lower. 4096 is typical, and ideal. Other values may have unintended consequences, as they are not error checked on creation.
 
 # Block Group Descriptor
-Similar to EXT, this structure represents the state of a block group. Starting at block address 2, an array is created with items for each block group in the filesystem.
+Similar to EXT, this structure represents the state of a block group. Starting at block address 2, an array is created with items for each block group in the file system.
 
 | Size  | Offset| Name                | Notes                                       |
 | ----- | ----- | ------------------- | ------------------------------------------- |
@@ -48,10 +48,10 @@ An entry represents a file, directory, or any other type of file. These are fixe
 | u32   | 72    | size_blocks           | Number of blocks the data is using                |
 | u8    | 76    | entry_type            | Type of entry (see Entry Type)                    |
 | u8    | 77    | permissions           | Permissions of the entry (see Permissions)        |
-| u32   | 78    | baddr_indirect_block  | Block address of indirect block with data blocks  |
+| u32   | 78    | baddr_indirect_block  | Block address of indirect block                   |
 
 ### Indirect Block
-Unlike EXT, each file ONLY has one indirect block. This does limit the size of a file to `(block_size / 4) * block_size`, but it makes traversing data much easier. This block holds an array of `baddr[block_size / 4]`, which are block addresses to the data of the entry.
+Unlike EXT, each file ONLY has one indirect block. This does limit the size of a file to `((block_size / 4) * block_size) * block_size` (~17GB with 4096 block size), but traversing data is much easier. This block holds an array of `baddr[block_size / sizeof(baddr)]`, which are block addresses to the data of the entry.
 
 ### Entry Type
 | Name              | Notes                         |
@@ -64,23 +64,23 @@ Unlike EXT, each file ONLY has one indirect block. This does limit the size of a
 Super meaning administrator. This file system does not protect against multiple users in version 1.0. For convenience, the mixed values are included in `ztfs.h`.
 | Name          | Notes                                             |
 | ------------- | ------------------------------------------------- |
-| SUPER_READ    | Super read permission                             |
-| SUPER_WRITE   | Super write permission                            |
-| SUPER_RW      | Super read and write (1 \| 2)                     |
-| SUPER_EXECUTE | Super execute permission                          |
-| SUPER_RWX     | Super read, write, and execute (1 \| 2 \| 4)      |
-| USER_READ     | User read permission                              |
-| ALL_READ      | Super and user read (1 \| 8)                      |
-| USER_WRITE    | User write permission                             |
-| ALL_WRITE     | Super and user write (2 \| 16)                    |
-| USER_RW       | User read and write (8 \| 16)                     |
-| USER_EXECUTE  | User execute permission                           |
-| ALL_EXECUTE   | Super and user execute (4 \| 32)                  |
-| USER_RWX      | User read, write, and execute (8 \| 16 \| 32)     |
-| ALL_RW        | Super and user read and write (1 \| 2 \| 8 \| 16) |
+| SUPER_READ    | Super read                                        |
+| SUPER_WRITE   | Super write                                       |
+| SUPER_RW      | Super read and write                              |
+| SUPER_EXECUTE | Super execute                                     |
+| SUPER_RWX     | Super read, write, and execute                    |
+| USER_READ     | User read                                         |
+| ALL_READ      | Super and user read                               |
+| USER_WRITE    | User write                                        |
+| ALL_WRITE     | Super and user write                              |
+| USER_RW       | User read and write                               |
+| USER_EXECUTE  | User execute                                      |
+| ALL_EXECUTE   | Super and user execute                            |
+| USER_RWX      | User read, write, and execute                     |
+| ALL_RW        | Super and user read and write                     |
 | ALL_RWX       | Super and user read, write, and execute           |
 
-# Layout on Disk
+# Disk Layout
 
 ### Boot Sector
 512-byte area for traditional boot sector.
@@ -95,4 +95,4 @@ Starting at block 2, regardless of block size. This is an array of `ztfs_block_g
 Preallocated on disk on the next block after the BGDT, spanning as many blocks as there are block groups. The first bitmap represents BG0, and so on.
 
 ### Data Start
-The first block in data start, represented in the `blueprint` as `baddr_first_block_group` typically holds the root directory entry. This entry is very important, as it is from where all other entries are derived from. All subsequent blocks after this block is free for storage, until the end of the disk.
+The first block in data start. Represented in the `blueprint` as `baddr_first_block_group`, it typically holds the root directory entry. This entry is very important, as it is from where all other entries are derived from. All subsequent blocks after this block is free for storage, until the end of the disk.
