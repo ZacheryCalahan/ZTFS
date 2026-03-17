@@ -35,6 +35,9 @@ Similar to EXT, this structure represents the state of a block group. Starting a
 | u16   | 12    | num_entries         | Number of entries this block group has      |
 | u16   | 14    | reserved            |                                             |
 
+### Bitmaps
+The bitmaps are one block in size, and are ordered by MSB. If block 0 in the group is allocated, the first byte will read 0b10000000.
+
 # Entry
 An entry represents a file, directory, or any other type of file. These are fixed in size, and are treated like an array.
 
@@ -44,11 +47,11 @@ An entry represents a file, directory, or any other type of file. These are fixe
 | Size  | Offset| Name                  | Notes                                             |
 | ----- | ----- | --------------------- | ------------------------------------------------- |
 | u8[64]| 0     | name                  | Name of the entry, null-terminated. Max 63 chars. |
-| u64   | 64    | size                  | Size in bytes if file, entry count for directory  |
+| u64   | 64    | size                  | Size in bytes if file, entry count for directory, index into referred entry's entry array if reference. |
 | u32   | 72    | size_blocks           | Number of blocks the data is using                |
 | u8    | 76    | entry_type            | Type of entry (see Entry Type)                    |
 | u8    | 77    | permissions           | Permissions of the entry (see Permissions)        |
-| u32   | 78    | baddr_indirect_block  | Block address of indirect block                   |
+| u32   | 78    | baddr_indirect_block  | Block address of indirect block, or index into referred entry's entry array if reference |
 
 ### Indirect Block
 Unlike EXT, each file ONLY has one indirect block. This does limit the size of a file to `((block_size / 4) * block_size) * block_size` (~17GB with 4096 block size), but traversing data is much easier. This block holds an array of `baddr[block_size / sizeof(baddr)]`, which are block addresses to the data of the entry.
@@ -59,6 +62,10 @@ Unlike EXT, each file ONLY has one indirect block. This does limit the size of a
 | NONE              | Nonexistent Entry             |
 | ENTRY_DIRECTORY   | Directory                     |
 | ENTRY_FILE        | General File                  |
+| ENTRY_REF         | Reference to Entry            |
+
+### Reference Entry
+In the case an entry is a reference to another entry, the type is set to `ENTRY_REF`, and `baddr_indirect_block` is the block address of the entry referenced, and `size` is the index into that block.
 
 ### Permissions
 Super meaning administrator. This file system does not protect against multiple users in version 1.0. For convenience, the mixed values are included in `ztfs.h`.
@@ -96,3 +103,8 @@ Preallocated on disk on the next block after the BGDT, spanning as many blocks a
 
 ### Data Start
 The first block in data start. Represented in the `blueprint` as `baddr_first_block_group`, it typically holds the root directory entry. This entry is very important, as it is from where all other entries are derived from. All subsequent blocks after this block is free for storage, until the end of the disk.
+
+# Directories
+One key detail is that ZTFS does not differentiate between a directory and a file, meaning a directory contents are just more entries.
+
+Each directory SHOULD have 2 entries on creation, which are the current entry `./` and the previous entry `../`. The root directory entry is the only exception, which has the current entry for both `./` and `../`.

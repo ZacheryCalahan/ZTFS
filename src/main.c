@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "ztfs/ztfs_create.h"
-#include "ztfs/ztfs_info.h"
+#include "ztfs/operations/ztfs_create.h"
+#include "ztfs/operations/ztfs_info.h"
+#include "ztfs/operations/ztfs_mkdir.h"
+#include "ztfs/ztfs_block.h"
 
 int main(int argc, char **argv) {
     if (argc == 1) {
@@ -17,6 +19,8 @@ int main(int argc, char **argv) {
         while (fgets(data, 128, help) != NULL) {
             printf("%s", data);
         }
+
+        fclose(help);
 
         return -1;
     }
@@ -53,11 +57,58 @@ int main(int argc, char **argv) {
         }
 
         case ('p'): {
+            if (argc != 3) {
+                printf("Error: Invalid number of arguments for -p.\n");
+                return -1;
+            }
             int ret = ztfs_print_info(argv[2]);
             if (ret != 0) {
                 printf("Error: Could not get info on %s.\n", argv[2]);
                 return -1;
             }
+            break;
+        }
+
+        case ('t'): {
+            if (argc != 3) {
+                printf("Error: Invalid number of arguments for -t.\n");
+                return -1;
+            }
+
+            int ret = ztfs_print_tree(argv[2]);
+            if (ret != 0) {
+                printf("Error: Could not get info on %s.\n", argv[2]);
+                return -1;
+            }
+            break;
+        }
+
+        case ('m'): {
+            if (argc != 4) {
+                printf("Error: Invalid number of arguments for -m.\n");
+                return -1;
+            }
+            
+            int ret = ztfs_mkdir(argv[2], argv[3]);
+            if (ret) {
+                printf("Error: Could not create directory.\n");
+                return -1;
+            }
+            break;
+        }
+
+        case ('e'): {
+            if (argc != 4) {
+                printf("Error: Invalid number of arguments for -e\n");
+                return -1;
+            }
+            
+            int ret = ztfs_print_entry(argv[2], argv[3]);
+            if (ret) {
+                printf("Error: Could not print entry info.\n");
+                return -1;
+            }
+
             break;
         }
 
