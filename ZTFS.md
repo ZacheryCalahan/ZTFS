@@ -44,14 +44,17 @@ An entry represents a file, directory, or any other type of file. These are fixe
 ### Note!
 - It is not guaranteed that entries are sequential, nor that they may be in the same block. To check for a valid entry, `entry_type` must not equal 0.
 
-| Size  | Offset| Name                  | Notes                                             |
-| ----- | ----- | --------------------- | ------------------------------------------------- |
-| u8[64]| 0     | name                  | Name of the entry, null-terminated. Max 63 chars. |
-| u64   | 64    | size                  | Size in bytes if file, entry count for directory, index into referred entry's entry array if reference. |
-| u32   | 72    | size_blocks           | Number of blocks the data is using                |
-| u8    | 76    | entry_type            | Type of entry (see Entry Type)                    |
-| u8    | 77    | permissions           | Permissions of the entry (see Permissions)        |
-| u32   | 78    | baddr_indirect_block  | Block address of indirect block, or index into referred entry's entry array if reference |
+| Size  | Offset| Name                  | Notes                                                                                                     |
+| ----- | ----- | --------------------- | --------------------------------------------------------------------------------------------------------- |
+| u8[64]| 0     | name                  | Name of the entry, null-terminated. Max 63 chars.                                                         |
+| u64   | 64    | size                  | Size in bytes if file, entry count for directory, index into referred entry's entry array if reference.   |
+| u32   | 72    | size_blocks           | Number of blocks the data is using                                                                        |
+| u8    | 76    | entry_type            | Type of entry (see Entry Type)                                                                            |
+| u8    | 77    | permissions           | Permissions of the entry (see Permissions)                                                                |
+| u32   | 78    | baddr_indirect_block  | Block address of indirect block, or index into referred entry's entry array if reference                  |
+| u8    | 79    | entry_idx             | Entry's index into its parent's entry array in the data block                                             |
+| u8    | 80    | data_block_idx        | Entry's index into its parent's indirect block                                                            |
+| u32   | 84    | entry_baddr           | Block address where the entry is stored                                                                   |
 
 ### Indirect Block
 Unlike EXT, each file ONLY has one indirect block. This does limit the size of a file to `((block_size / 4) * block_size) * block_size` (~17GB with 4096 block size), but traversing data is much easier. This block holds an array of `baddr[block_size / sizeof(baddr)]`, which are block addresses to the data of the entry.
