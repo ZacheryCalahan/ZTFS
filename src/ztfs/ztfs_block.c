@@ -452,12 +452,74 @@ int ztfs_find_free_entry(FILE *image_file, struct ztfs_entry *parent, uint32_t *
 }
 
 int ztfs_free_block_bitmap(FILE *image_file, baddr_t baddr_block) {
+    if (image_file == NULL) {
+        printf("Error: Invalid image.\n");
+        return -1;
+    }
+
+    struct ztfs_blueprint blueprint;
+
+    if (ztfs_read_blueprint(image_file, &blueprint)) {
+        printf("Error: Could not read blueprint.\n");
+        return -1;
+    }
+
+    // Determine which block group block belongs to (Data blocks don't start at baddr 0.)
+    if (baddr_block < blueprint.baddr_first_block_group) {
+        printf("Error: Cannot mark block before first block group.\n");
+        return -1;
+    }
+
+    uint32_t block_idx_from_start = baddr_block - blueprint.baddr_first_block_group;
+    uint32_t bg_num = block_idx_from_start / blueprint.block_group_size;
+    struct ztfs_block_group_descriptor bgd;
+
+    if (ztfs_read_bgd(image_file, &bgd, bg_num)) {
+        printf("Error: Could not read BG%i.\n", bg_num);
+        return -1;
+    }
+
+    uint32_t bnum_in_bg = block_idx_from_start % blueprint.block_group_size;
+    uint32_t byte = bnum_in_bg / 8;
+    uint32_t bit = bnum_in_bg % 8;
+    uint8_t mask = 0b10000000 >> bit;
+    mask = ~mask; // Flip all the bits
+
+    uint8_t bitmap_byte;
+
+    if (ztfs_read(image_file, &bitmap_byte, sizeof(uint8_t), 1, (bgd.baddr_block_bitmap * blueprint.block_size) + byte)) {
+        printf("Error: Could not read bitmap.\n");
+        return -1;
+    }
+
+    bitmap_byte &= mask; // & is used with flipped mask, because ^ would mistakenly allocate already free blocks.
+
+    if (ztfs_write(image_file, &bitmap_byte, sizeof(uint8_t), 1, (bgd.baddr_block_bitmap * blueprint.block_size) + byte)) {
+        printf("Error: Could not update bitmap.\n");
+        return -1;
+    }
     
     return 0;
 }
 
-int ztfs_place_entry(FILE *image_file, struct ztfs_entry *parent, struct ztfs_entry *child) {
+uint32_t ztfs_find_block_group_from_baddr(FILE *image_file, baddr_t baddr_block) {
+    if (image_file == NULL) {
+        printf("Error: Invalid file on write.\n");
+        return -1;
+    }
 
-    return 0;
+    struct ztfs_blueprint blueprint;
+    if (ztfs_read_blueprint(image_file, &blueprint)) {
+        printf("Error: Could not read blueprint.\n");
+        return -1;
+    }
+
+    if (baddr_block < blueprint.baddr_first_block_group) {
+        printf("Error: Block is not in a block group.\n");
+        return -1;
+    }
+
+    uint32_t block_idx_from_start = baddr_block - blueprint.baddr_first_block_group;
+    return block_idx_from_start / blueprint.block_group_size;
 }
 

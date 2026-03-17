@@ -160,6 +160,6 @@ int ztfs_place_entry(FILE *image_file, struct ztfs_entry *parent, struct ztfs_en
  * 
  * @returns -1 on failure, or number of the block group on success.
  */
-int ztfs_find_block_group_from_baddr(FILE *image_file, baddr_t baddr_block);
+uint32_t ztfs_find_block_group_from_baddr(FILE *image_file, baddr_t baddr_block);
 
 #endif
