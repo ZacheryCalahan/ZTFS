@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../ztfs_block.h"
+#include "../ztfs_utils.h"
 
 int ztfs_mkdir(char* name, char* path) {
     FILE *image_file;
@@ -29,23 +30,12 @@ int ztfs_mkdir(char* name, char* path) {
     // Divide the last item of the path from the rest
     char *parent_path = malloc(strlen(path) + 1);
     char *dir_name = malloc(strlen(path) + 1);
-    char *last = strrchr(path, '/');
-
-    if (last == NULL) {
-        printf("Error: Invalid directory name.\n");
+    
+    if (split_path_from_entry(path, parent_path, dir_name)) {
+        printf("Error: Could not split parent entry from new directory name.\n");
+        free(dir_name);
+        free(parent_path);
         return -1;
-    } else {
-        size_t parent_len = last - path;
-
-        if (parent_len == 0) {
-            // Parent is (probably.) the root directory
-            strcpy(parent_path, "/");
-        } else {
-            strncpy(parent_path, path, parent_len);
-            parent_path[parent_len] = '\0';
-        }
-
-        strcpy(dir_name, last + 1);
     }
 
     // Find parent entry via its path
@@ -171,7 +161,6 @@ int ztfs_mkdir(char* name, char* path) {
     parent_entry.size++;
     ztfs_write(image_file, &parent_entry, sizeof(struct ztfs_entry), 1, parent_entry_offset);
     
-
     free(parent_idb);
     free(dir_name);
     free(parent_path);

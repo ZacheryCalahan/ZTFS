@@ -4,6 +4,7 @@
 #include "ztfs/operations/ztfs_create.h"
 #include "ztfs/operations/ztfs_info.h"
 #include "ztfs/operations/ztfs_mkdir.h"
+#include "ztfs/operations/ztfs_insert.h"
 #include "ztfs/ztfs_block.h"
 
 int main(int argc, char **argv) {
@@ -106,6 +107,21 @@ int main(int argc, char **argv) {
             int ret = ztfs_print_entry(argv[2], argv[3]);
             if (ret) {
                 printf("Error: Could not print entry info.\n");
+                return -1;
+            }
+
+            break;
+        }
+
+        case ('i'): {
+            if (argc != 5) {
+                printf("Error: Invalid number of arguments for -i\n");
+                return -1;
+            }
+
+            int ret = ztfs_insert_file(argv[2], argv[3], argv[4]);
+            if (ret) {
+                printf("Error: Could not insert file.\n");
                 return -1;
             }
 

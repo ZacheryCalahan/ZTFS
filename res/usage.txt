@@ -36,4 +36,12 @@ Usage:
                 <disk image> Path to the image
                 <path> Path to new directory, where last item in path is 
                     directory to create (ie. `/home/dir`)
+        
+        -i <disk image> <file path> <dir path>
+            Insert a file into a directory
+
+            arguments:
+                <disk image> Path to the image
+                <file path> Path to the file to insert
+                <dir path> Path to the directory to insert the file
 
