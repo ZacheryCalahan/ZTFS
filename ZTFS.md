@@ -23,6 +23,7 @@ Almost all values are constants, and only a few are strictly required to interfa
 
 ### Useful things to note:
 - The block size MUST be a multiple of 1024, and not lower. 4096 is typical, and ideal. Other values may have unintended consequences, as they are not error checked on creation.
+- The blueprint is always located at byte 512 on disk.
 
 # Block Group Descriptor
 Similar to EXT, this structure represents the state of a block group. Starting at block address 2, an array is created with items for each block group in the file system.
@@ -44,20 +45,21 @@ An entry represents a file, directory, or any other type of file. These are fixe
 ### Note!
 - It is not guaranteed that entries are sequential, nor that they may be in the same block. To check for a valid entry, `entry_type` must not equal 0.
 
-| Size  | Offset| Name                  | Notes                                                                                                     |
-| ----- | ----- | --------------------- | --------------------------------------------------------------------------------------------------------- |
-| u8[64]| 0     | name                  | Name of the entry, null-terminated. Max 63 chars.                                                         |
-| u64   | 64    | size                  | Size in bytes if file, entry count for directory, index into referred entry's entry array if reference.   |
-| u32   | 72    | size_blocks           | Number of blocks the data is using                                                                        |
-| u8    | 76    | entry_type            | Type of entry (see Entry Type)                                                                            |
-| u8    | 77    | permissions           | Permissions of the entry (see Permissions)                                                                |
-| u32   | 78    | baddr_indirect_block  | Block address of indirect block, or index into referred entry's entry array if reference                  |
-| u8    | 79    | entry_idx             | Entry's index into its parent's entry array in the data block                                             |
-| u8    | 80    | data_block_idx        | Entry's index into its parent's indirect block                                                            |
-| u32   | 84    | entry_baddr           | Block address where the entry is stored                                                                   |
+| Size  | Offset| Name                      | Notes                                                                                                     |
+| ----- | ----- | ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| u8[64]| 0     | name                      | Name of the entry, null-terminated. Max 63 chars.                                                         |
+| u64   | 64    | size                      | Size in bytes if file, entry count for directory, index into referred entry's entry array if reference.   |
+| u32   | 72    | size_blocks               | Number of blocks the data is using                                                                        |
+| u8    | 76    | entry_type                | Type of entry (see Entry Type)                                                                            |
+| u8    | 77    | permissions               | Permissions of the entry (see Permissions)                                                                |
+| u32   | 78    | baddr_indirect_block      | Block address of indirect block, or index into referred entry's entry array if reference                  |
+| u32   | 82    | baddr_double_indir_block  | Block address of double indirect block, if required.                                                      |
+| u8    | 83    | entry_idx                 | Entry's index into its parent's entry array in the data block                                             |
+| u8    | 84    | data_block_idx            | Entry's index into its parent's indirect block                                                            |
+| u32   | 88    | entry_baddr               | Block address where the entry is stored                                                                   |
 
 ### Indirect Block
-Unlike EXT, each file ONLY has one indirect block. This does limit the size of a file to `((block_size / 4) * block_size) * block_size` (~17GB with 4096 block size), but traversing data is much easier. This block holds an array of `baddr[block_size / sizeof(baddr)]`, which are block addresses to the data of the entry.
+Unlike EXT, each file ONLY has one indirect block and a double indirect block. This does limit the size of a file to `(block_size / 4) * (1 + (block_size / 4)) * block_size` (~4GB with 4096 block size). An indirect block holds block address pointers to data.
 
 ### Entry Type
 | Name              | Notes                         |

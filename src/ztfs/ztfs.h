@@ -67,6 +67,7 @@ struct ztfs_entry {
     uint8_t entry_type;                 // Type of entry, ie. directory, file, etc.
     uint8_t permissions;                // Permissions of the entry
     uint32_t baddr_indirect_block;      // Block address of the block holding pointers to data blocks, or block address of referred entry
+    uint32_t baddr_double_indir_block;  // If requiring more than the single indirect, this points to a block of indirect baddrs.
     uint8_t entry_idx;                  // This entry's index into its parent's data block entry array. (for reference use)
     uint8_t data_block_idx;             // This entry's index into its parent's indirect block. (for reference use)
     baddr_t entry_baddr;                // This entry's block address (for reference use)

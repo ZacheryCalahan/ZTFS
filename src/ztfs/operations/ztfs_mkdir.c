@@ -73,6 +73,7 @@ int ztfs_mkdir(char* name, char* path) {
         .entry_type = ENTRY_DIRECTORY,
         .permissions = ALL_RW,
         .baddr_indirect_block = 0,
+        .baddr_double_indir_block = 0, // Unallocated.
         .entry_idx = entry_index,
         .data_block_idx = data_block_index,
         .entry_baddr = entry_block,
@@ -113,6 +114,7 @@ int ztfs_mkdir(char* name, char* path) {
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,
         .baddr_indirect_block = new_directory.entry_baddr,
+        .baddr_double_indir_block = 0, // Not required.
         .entry_idx = 0,
         .data_block_idx = 0,
         .entry_baddr = new_dir_entry_block
@@ -125,6 +127,7 @@ int ztfs_mkdir(char* name, char* path) {
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,
         .baddr_indirect_block = parent_entry.entry_baddr,
+        .baddr_double_indir_block = 0, // Not required.
         .entry_idx = 1,
         .data_block_idx = 0,
         .entry_baddr = new_dir_entry_block

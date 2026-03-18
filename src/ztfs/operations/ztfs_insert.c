@@ -75,6 +75,7 @@ int ztfs_insert_file(char *name, char *file_path, char *path) {
         .entry_type = ENTRY_FILE,
         .permissions = ALL_RW,
         .baddr_indirect_block = 0,
+        .baddr_double_indir_block = 0, // Unallocated.
         .entry_idx = entry_index,
         .data_block_idx = data_block_index,
         .entry_baddr = entry_block

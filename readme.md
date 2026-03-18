@@ -10,7 +10,6 @@ This project contains utilities for creating, editing, and repairing ZTFS file s
 - ZTFS does not differentiate between an file, directory, nor a directory entry. All of these are implemented in a fixed size data structure `Entry`. ZTFS uses 3 main structures, including the `Blueprint`, `Block Group Descriptors`, and `Entry`. These are defined in "ZTFS.h".
 - No concepts of time required, meaning a file does not require a time stamp.
 - No journaling, no redundancy, no extra steps. Though this does create an (inevitable) amount of instability, it does make it simple enough to implement and test knowledge of disk concepts before jumping into more mature file systems.
-- Hard cap of (block_size / 4) subentries in a given entry.
 
 # Build Instructions
 - Clone the repository on a Linux device

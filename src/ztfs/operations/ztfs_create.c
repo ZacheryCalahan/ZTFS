@@ -142,6 +142,7 @@ int ztfs_create_image(char* name, uint64_t size, uint32_t block_size) {
         .entry_type = ENTRY_DIRECTORY,
         .permissions = ALL_RW,
         .baddr_indirect_block = baddr_root_node + 1,
+        .baddr_double_indir_block = 0, // Unallocated.
         .entry_idx = 0,
         .data_block_idx = 0,
         .entry_baddr = baddr_root_node
@@ -154,6 +155,7 @@ int ztfs_create_image(char* name, uint64_t size, uint32_t block_size) {
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,
         .baddr_indirect_block = baddr_root_node,
+        .baddr_double_indir_block = 0, // Not required.
         .entry_idx = 0,
         .data_block_idx = 0,
         .entry_baddr = baddr_root_node
@@ -166,6 +168,7 @@ int ztfs_create_image(char* name, uint64_t size, uint32_t block_size) {
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,
         .baddr_indirect_block = baddr_root_node,
+        .baddr_double_indir_block = 0, // Not required.
         .entry_idx = 1,
         .data_block_idx = 0,
         .entry_baddr = baddr_root_node
