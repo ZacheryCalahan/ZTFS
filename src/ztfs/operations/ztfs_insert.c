@@ -67,6 +67,8 @@ int ztfs_insert_file(char *name, char *file_path, char *path) {
 
     baddr_t entry_block = parent_idb[data_block_index];
 
+    // TODO: Check if entry exist with this name.
+
     // Create (incomplete) file entry
     struct ztfs_entry new_file = {
         .name = "",
@@ -116,6 +118,7 @@ int ztfs_insert_file(char *name, char *file_path, char *path) {
         // Update block group
         struct ztfs_block_group_descriptor bdesc;
         uint32_t bg_num = ztfs_find_block_group_from_baddr(image_file, data_block_baddr);
+        ztfs_read_bgd(image_file, &bdesc, bg_num);
         bdesc.free_blocks--;
         ztfs_write_bgd(image_file, &bdesc, bg_num);
 

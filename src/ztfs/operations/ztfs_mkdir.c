@@ -143,13 +143,14 @@ int ztfs_mkdir(char* name, char* path) {
     // Insert "parent directory" entry
     ztfs_write(image_file, &ent_par, sizeof(struct ztfs_entry), 1, (new_dir_entry_block * blueprint.block_size) + sizeof(struct ztfs_entry));
 
-    // Update block group (s)
+    // Update block group for indirect block
     struct ztfs_block_group_descriptor bdesc;
     uint32_t bg_num = ztfs_find_block_group_from_baddr(image_file, new_dir_indir_block);
     ztfs_read_bgd(image_file, &bdesc, bg_num);
     bdesc.free_blocks--;
     ztfs_write_bgd(image_file, &bdesc, bg_num);
     
+    // Update block group for entry block
     bg_num = ztfs_find_block_group_from_baddr(image_file, new_dir_entry_block);
     ztfs_read_bgd(image_file, &bdesc, bg_num);
     bdesc.free_blocks--;

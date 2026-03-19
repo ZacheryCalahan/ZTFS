@@ -269,7 +269,9 @@ baddr_t ztfs_find_unused_block(FILE *image_file) {
         ztfs_read(image_file, bitmap, blueprint.block_size, 1, bgd.baddr_block_bitmap * blueprint.block_size);
         for (uint32_t bitmap_byte = 0; bitmap_byte < blueprint.block_size; bitmap_byte++) {
             
-            if (bitmap[bitmap_byte] == 0xFF) continue; // Skip full bytes
+            if (bitmap[bitmap_byte] == 0xFF) {
+                continue; // Skip full bytes
+            }
 
             // Iterate through the bits
             for (int i = 0; i < 8; i++) {

@@ -193,12 +193,13 @@ int r_print_tree(FILE *image_file, struct ztfs_blueprint *bp, struct ztfs_entry 
             ztfs_read(image_file, subdirs, bp->block_size, 1, entry_indir_block[entry_block_num] * bp->block_size);
             // Iterate through entry array
             for (uint32_t i = 0; i < bp->block_size / sizeof(struct ztfs_entry); i++) {
-                if (subdirs[i].entry_type == NONE) continue; // Skip empty entries
+                struct ztfs_entry cur_entry = subdirs[i];
+                if (cur_entry.entry_type == NONE) continue; // Skip empty entries
                 
                 entry_count--; // Must be a valid entry!
-                if (subdirs[i].entry_type == ENTRY_DIRECTORY) {
-                    if (r_print_tree(image_file, bp, &subdirs[i], depth + 1)) {
-                        printf("Error: Could not traverse \"%s\".\n", subdirs[i].name);
+                if (cur_entry.entry_type == ENTRY_DIRECTORY) {
+                    if (r_print_tree(image_file, bp, &cur_entry, depth + 1)) {
+                        printf("Error: Could not traverse \"%s\".\n", cur_entry.name);
                         free(entry_indir_block);
                         free(subdirs);
                         return -1;
