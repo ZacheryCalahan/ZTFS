@@ -1,5 +1,7 @@
 #include "ztfs_utils.h"
 #include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 int split_path_from_entry(char *full_path, char *parent_path, char *entry_name) {
     // Divide the last item of the path from the rest
