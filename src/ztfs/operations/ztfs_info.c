@@ -68,7 +68,7 @@ int ztfs_print_info(char *name) {
     // Root entry info
     printf("Root Directory Entry:\n");
     printf("\tName: \"%s\"\n", root_entry.name);
-    printf("\tNumber of Entries: %lu\n", root_entry.size);
+    printf("\tNumber of Entries: %lu\n", root_entry.entry_count);
     printf("\tNumber of Blocks: %i\n", root_entry.size_blocks);
     printf("\tEntry Type: %i\n", root_entry.entry_type);
     printf("\tEntry Permissions: %i\n", root_entry.permissions);
@@ -100,14 +100,14 @@ int ztfs_print_entry(char *name, char *path) {
     
     printf("\tEntry Type: %i\n", entry.entry_type);
     if (entry.entry_type == ENTRY_DIRECTORY) {
-        printf("\tNumber of Entries: %lu\n", entry.size);
+        printf("\tNumber of Entries: %lu\n", entry.entry_count);
         printf("\tNumber of Blocks: %i\n", entry.size_blocks);
         printf("\tBlock Address of Data: %i\n", entry.baddr_indirect_block);
     } else if (entry.entry_type == ENTRY_REF) {
-        printf("\tReferencing Entry Index: %lu\n", entry.size);
+        printf("\tReferencing Entry Index: %lu\n", entry.entry_count);
         printf("\tOf Block Address: %i\n", entry.baddr_indirect_block);
     } else {
-        printf("\tFile size: %lu\n", entry.size);
+        printf("\tFile size: %lu\n", entry.entry_count);
         printf("\tNumber of Blocks: %i\n", entry.size_blocks);
         printf("\tBlock Address of Data: %i\n", entry.baddr_indirect_block);
     }
@@ -179,7 +179,7 @@ int r_print_tree(FILE *image_file, struct ztfs_blueprint *bp, struct ztfs_entry 
     if (entry->entry_type == ENTRY_DIRECTORY) {
         struct ztfs_entry *subdirs = malloc(bp->block_size);
         baddr_t *entry_indir_block = malloc(bp->block_size); // Entry's indirect block
-        uint32_t entry_count = entry->size; // Number of entries to find
+        uint32_t entry_count = entry->entry_count; // Number of entries to find
         
         if (ztfs_read(image_file, entry_indir_block, bp->block_size, 1, entry->baddr_indirect_block * bp->block_size)) {
             printf("Error: Could not read \"%s\" data.\n", entry->name);

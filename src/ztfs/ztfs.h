@@ -38,7 +38,7 @@ enum PERMISSIONS {
 };
 
 struct ztfs_blueprint {
-    uint64_t signature;                 // "ZTFS" required to mark this is a ZTFS filesystem
+    uint64_t signature;                 // Signature is required to mark this is a ZTFS filesystem
     uint16_t version_major;             // Major version number
     uint16_t version_minor;             // Minor version number
     uint32_t block_size;                // Size of a block in bytes
@@ -61,16 +61,26 @@ struct ztfs_block_group_descriptor {
 };
 
 struct ztfs_entry {
-    char name[64];                      // Name of the entry, \0 terminated.
-    uint64_t size;                      // Number of bytes the data is using if file, number of entries if dir, index into entry array block if ref.
-    uint32_t size_blocks;               // Number of blocks the data is using
-    uint8_t entry_type;                 // Type of entry, ie. directory, file, etc.
-    uint8_t permissions;                // Permissions of the entry
-    uint32_t baddr_indirect_block;      // Block address of the block holding pointers to data blocks, or block address of referred entry
-    uint32_t baddr_double_indir_block;  // If requiring more than the single indirect, this points to a block of indirect baddrs.
-    uint8_t entry_idx;                  // This entry's index into its parent's data block entry array. (for reference use)
-    uint8_t data_block_idx;             // This entry's index into its parent's indirect block. (for reference use)
-    baddr_t entry_baddr;                // This entry's block address (for reference use)
+    char name[64];                          // Name of the entry, \0 terminated.
+    union {
+        uint64_t file_size_bytes;           // If file, this is the size in bytes
+        uint64_t entry_count;               // If dir, this is the count of the subentries
+        uint64_t ref_target_entry_index;    // If ref, this is the index into the entry block to referred entry
+    };
+    uint32_t size_blocks;                   // Number of blocks the data is using
+    uint8_t entry_type;                     // Type of entry, ie. directory, file, etc.
+    uint8_t permissions;                    // Permissions of the entry
+    union {
+        uint32_t baddr_indirect_block;      // Block address of the indirect block
+        uint32_t ref_target_block;          // Block address of the referred entry
+    };
+
+    uint32_t baddr_double_indir_block;      // If requiring more than the single indirect, this points to a block of indirect baddrs.
+    
+    // Entry location
+    uint8_t entry_idx;                      // This entry's index into its parent's data block entry array. (for reference use)
+    uint8_t data_block_idx;                 // This entry's index into its parent's indirect block. (for reference use)
+    baddr_t entry_baddr;                    // This entry's block address (for reference use)
 };
 
 #endif

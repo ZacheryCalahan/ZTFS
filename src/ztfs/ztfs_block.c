@@ -354,7 +354,7 @@ int ztfs_find_entry_via_path(FILE *image_file, struct ztfs_entry *entry, char *p
             }
 
             // Traverse each entry in this block
-            uint32_t entry_count = entry_to_search.size;
+            uint32_t entry_count = entry_to_search.entry_count;
 
             for (uint32_t entry_idx = 0; entry_idx < blueprint.block_size / sizeof(struct ztfs_entry); entry_idx++) {
                 if (entry_count == 0) break;

@@ -72,7 +72,7 @@ int ztfs_insert_file(char *name, char *file_path, char *path) {
     // Create (incomplete) file entry
     struct ztfs_entry new_file = {
         .name = "",
-        .size = data_file_size,
+        .file_size_bytes = data_file_size,
         .size_blocks = blocks_needed,
         .entry_type = ENTRY_FILE,
         .permissions = ALL_RW,
@@ -146,7 +146,7 @@ int ztfs_insert_file(char *name, char *file_path, char *path) {
     ztfs_write_blueprint(image_file, &blueprint);
 
     // Update parent entry information
-    parent_entry.size++;
+    parent_entry.entry_count++;
     ztfs_write(image_file, &parent_entry, sizeof(struct ztfs_entry), 1, parent_entry_offset);
 
     free(new_file_indir_block);

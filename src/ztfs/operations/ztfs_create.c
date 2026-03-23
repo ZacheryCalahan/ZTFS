@@ -137,7 +137,7 @@ int ztfs_create_image(char* name, uint64_t size, uint32_t block_size) {
     // This is a VERY important entry, as it's the root of all other entries. No writing allowed!
     struct ztfs_entry root_entry = {
         .name = "/", //.Note: Only the root entry has a `/` in its name.
-        .size = 2, // Entry for current directory and parent
+        .entry_count = 2, // Entry for current directory and parent
         .size_blocks = 1,
         .entry_type = ENTRY_DIRECTORY,
         .permissions = ALL_RW,
@@ -150,7 +150,7 @@ int ztfs_create_image(char* name, uint64_t size, uint32_t block_size) {
 
     struct ztfs_entry current_directory_entry = {
         .name = "./",
-        .size = 0,
+        .entry_count = 0,
         .size_blocks = 0,
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,
@@ -163,7 +163,7 @@ int ztfs_create_image(char* name, uint64_t size, uint32_t block_size) {
 
     struct ztfs_entry parent_directory_entry = {
         .name = "../",
-        .size = 0,
+        .entry_count = 0,
         .size_blocks = 0,
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,

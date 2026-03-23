@@ -68,7 +68,7 @@ int ztfs_mkdir(char* name, char* path) {
     // Create data structures for new entry
     struct ztfs_entry new_directory = {
         .name = "",
-        .size = 2, // `./` and `../` entries
+        .entry_count = 2, // `./` and `../` entries
         .size_blocks = 1,
         .entry_type = ENTRY_DIRECTORY,
         .permissions = ALL_RW,
@@ -109,7 +109,7 @@ int ztfs_mkdir(char* name, char* path) {
     // Parent and current directory entries for new dir
     struct ztfs_entry ent_cur = {
         .name = "./",
-        .size = entry_index,
+        .entry_count = entry_index,
         .size_blocks = 0,
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,
@@ -122,7 +122,7 @@ int ztfs_mkdir(char* name, char* path) {
 
     struct ztfs_entry ent_par = {
         .name = "../",
-        .size = parent_entry.entry_idx,
+        .entry_count = parent_entry.entry_idx,
         .size_blocks = 0,
         .entry_type = ENTRY_REF,
         .permissions = ALL_RW,
@@ -162,7 +162,7 @@ int ztfs_mkdir(char* name, char* path) {
     ztfs_write_blueprint(image_file, &blueprint);
 
     // Update parent entry information
-    parent_entry.size++;
+    parent_entry.entry_count++;
     ztfs_write(image_file, &parent_entry, sizeof(struct ztfs_entry), 1, parent_entry_offset);
     
     free(parent_idb);
