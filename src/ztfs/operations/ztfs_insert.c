@@ -86,7 +86,7 @@ int ztfs_insert_file(char *name, char *file_path, char *path) {
 
     // Allocate block for indirect block
     baddr_t new_file_indir_block_baddr = ztfs_find_unused_block(image_file);
-    if (new_file_indir_block_baddr == -1) {
+    if (!new_file_indir_block_baddr) {
         printf("Error: Could not allocate a free block for new file's indirect block.\n");
         free(parent_idb);
         free(entry_name);
@@ -101,10 +101,10 @@ int ztfs_insert_file(char *name, char *file_path, char *path) {
 
     // Insert data into the file
     uint8_t *buf = malloc(blueprint.block_size);
-    for (int i = 0; i < blocks_needed; i++) {
+    for (uint32_t i = 0; i < blocks_needed; i++) {
         // Allocate block
         baddr_t data_block_baddr = ztfs_find_unused_block(image_file);
-        if (data_block_baddr == -1) {
+        if (!data_block_baddr) {
             printf("Error: Could not allocate a free block for new file's data.\n");
             free(parent_idb);
             free(entry_name);

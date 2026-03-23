@@ -77,12 +77,13 @@ int ztfs_mkdir(char* name, char* path) {
         .entry_idx = entry_index,
         .data_block_idx = data_block_index,
         .entry_baddr = entry_block,
+        .ref_count = 2
     };
     strcpy(new_directory.name, dir_name);
 
     // Allocate block for indirect block
     baddr_t new_dir_indir_block = ztfs_find_unused_block(image_file);
-    if (new_dir_indir_block == -1) {
+    if (!new_dir_indir_block) {
         printf("Error: Could not allocate a free block for indirect block.\n");
         free(parent_idb);
         free(dir_name);
@@ -94,7 +95,7 @@ int ztfs_mkdir(char* name, char* path) {
 
     // Allocate block for new directory entries
     baddr_t new_dir_entry_block = ztfs_find_unused_block(image_file);
-    if (new_dir_entry_block == -1) {
+    if (!new_dir_entry_block) {
         printf("Error: Could not allocate a free block for new directory's entries.\n");
         free(parent_idb);
         free(dir_name);
@@ -117,7 +118,8 @@ int ztfs_mkdir(char* name, char* path) {
         .baddr_double_indir_block = 0, // Not required.
         .entry_idx = 0,
         .data_block_idx = 0,
-        .entry_baddr = new_dir_entry_block
+        .entry_baddr = new_dir_entry_block,
+        .ref_count = 0
     };
 
     struct ztfs_entry ent_par = {
@@ -130,7 +132,8 @@ int ztfs_mkdir(char* name, char* path) {
         .baddr_double_indir_block = 0, // Not required.
         .entry_idx = 1,
         .data_block_idx = 0,
-        .entry_baddr = new_dir_entry_block
+        .entry_baddr = new_dir_entry_block,
+        .ref_count = 0
     };
     
     // Insert new directory entry into parent

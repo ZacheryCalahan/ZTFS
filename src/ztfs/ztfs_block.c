@@ -246,14 +246,14 @@ int ztfs_mark_block_used_bitmap(FILE *image_file, baddr_t baddr_block) {
 baddr_t ztfs_find_unused_block(FILE *image_file) {
     if (image_file == NULL) {
         printf("Error: Invalid file on write.\n");
-        return -1;
+        return 0;
     }
 
     struct ztfs_blueprint blueprint;
 
     if (ztfs_read_blueprint(image_file, &blueprint)) {
         printf("Error: Could not read blueprint.\n");
-        return -1;
+        return 0;
     }
 
     // Iterate through bitmaps in each block group
@@ -263,7 +263,7 @@ baddr_t ztfs_find_unused_block(FILE *image_file) {
         if (ztfs_read_bgd(image_file, &bgd, bg)) {
             printf("Error: Could not read Block Group %i.\n", bg);
             free(bitmap);
-            return -1;
+            return 0;
         }
         
         ztfs_read(image_file, bitmap, blueprint.block_size, 1, bgd.baddr_block_bitmap * blueprint.block_size);
@@ -289,7 +289,7 @@ baddr_t ztfs_find_unused_block(FILE *image_file) {
     }
 
     free(bitmap);
-    return -1; // Did not find unused block.
+    return 0; // Did not find unused block.
 }
 
 int ztfs_find_entry_via_path(FILE *image_file, struct ztfs_entry *entry, char *path) {

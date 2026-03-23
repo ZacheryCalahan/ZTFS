@@ -76,6 +76,7 @@ struct ztfs_entry {
     };
 
     uint32_t baddr_double_indir_block;      // If requiring more than the single indirect, this points to a block of indirect baddrs.
+    uint16_t ref_count;                     // Number of times this is referenced
     
     // Entry location
     uint8_t entry_idx;                      // This entry's index into its parent's data block entry array. (for reference use)

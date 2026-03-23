@@ -114,7 +114,7 @@ int ztfs_free_block_bitmap(FILE *image_file, baddr_t baddr_block);
  * 
  * @param image_file File of image
  * 
- * @returns Block address of a free block, or -1 if not found.
+ * @returns Block address of a free block, or 0 if not found.
  */
 baddr_t ztfs_find_unused_block(FILE *image_file);
 
