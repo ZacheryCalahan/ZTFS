@@ -61,14 +61,14 @@ An entry represents a file, directory, or any other type of file. These are fixe
 | Size  | Offset| Name                      | Notes                                                                                                     |
 | ----- | ----- | ------------------------- | --------------------------------------------------------------------------------------------------------- |
 | u8[64]| 0     | name                      | Name of the entry, null-terminated. Max 63 chars.                                                         |
-| u64   | 64    | **file_size_bytes**       | Size in bytes if file                                                                                     |
-| u64   | 64    | **entry_count**           | Number of entries if directory                                                                            |
-| u64   | 64    | **ref_target_entry_index**| Index into the entry array of block pointed to by ref_target_block                                        |
+| u64   | 64    | *file_size_bytes*         | Size in bytes if file                                                                                     |
+| u64   | 64    | *entry_count*             | Number of entries if directory                                                                            |
+| u64   | 64    | *ref_target_entry_index*  | Index into the entry array of block pointed to by ref_target_block                                        |
 | u32   | 72    | size_blocks               | Number of blocks the data is using, not including either of the indirect and double indirect blocks.      |
 | u8    | 76    | entry_type                | Type of entry (see Entry Type)                                                                            |
 | u8    | 77    | permissions               | Permissions of the entry (see Permissions)                                                                |
-| u32   | 78    | **baddr_indirect_block**  | Block address of indirect block                                                                           |
-| u32   | 78    | **ref_target_block**      | Block address of referred entry                                                                           |
+| u32   | 78    | *baddr_indirect_block*    | Block address of indirect block                                                                           |
+| u32   | 78    | *ref_target_block*        | Block address of referred entry                                                                           |
 | u32   | 82    | baddr_double_indir_block  | Block address of double indirect block, **only** for regular file use.                                    |
 | u8    | 83    | entry_idx                 | Entry's index into its parent's entry array                                                               |
 | u8    | 84    | data_block_idx            | Entry's index into its parent's indirect block                                                            |
@@ -76,7 +76,7 @@ An entry represents a file, directory, or any other type of file. These are fixe
 | u16   | 92    | ref_count                 | Number of times this entry is referenced                                                                  |
 
 > [!IMPORTANT] 
-> - Bold items are unions, and are located within the same offset.
+> - Italicized items are unions, and are located within the same offset.
 > - `entry_idx`, `data_block_idx`, and `entry_baddr` are concrete, and **must** be the true location of the entry.
 
 ### Indirect Blocks
