@@ -16,7 +16,10 @@ enum ENTRY_TYPE {
     NONE = 0,
     ENTRY_DIRECTORY = 1,
     ENTRY_FILE = 2,
-    ENTRY_REF = 3,          // When an entry is a reference, the baddr_indirect_block points to the block address of referred entry.
+    ENTRY_REF = 3,          // Link
+    ENTRY_CHAR = 4,         // Character device
+    ENTRY_BLOCK = 5,        // Block device
+    ENTRY_SOCKET = 6        // Net socket
 };
 
 enum PERMISSIONS {
@@ -35,6 +38,8 @@ enum PERMISSIONS {
     USER_RWX = USER_RW | USER_EXECUTE,
     ALL_RW = SUPER_RW | USER_RW,
     ALL_RWX = SUPER_RWX | USER_RWX,
+    APPEND_ONLY = 64,
+    PERM_RESERVED = 128,
 };
 
 struct ztfs_blueprint {
